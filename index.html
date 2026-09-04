@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizon Europe Project Map Builder | Consortium Visualizer</title>
+  
+  <!-- SEO & Meta -->
+  <meta name="description" content="Interactive standalone tool to build, customize, and export high-resolution partner maps for Horizon Europe research project proposals.">
+  <meta name="keywords" content="Horizon Europe, EU Grant Proposal, Project Map Builder, Consortium Visualizer, EU Research Map">
+
+  <!-- External Libraries (html2canvas for PNG export) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Application Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-theme="dark">
+
+  <!-- Top App Header Banner -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-icon">🇪🇺</div>
+      <div class="brand-title">
+        Horizon Europe <span style="font-weight: 400; opacity: 0.8;">Map Builder</span>
+      </div>
+    </div>
+
+    <!-- Project Metadata Inputs -->
+    <div class="project-inputs-header">
+      <input type="text" id="project-acronym-input" class="acronym-input" value="HORIZON-AI" placeholder="ACRONYM">
+      <input type="text" id="project-title-input" class="title-input" value="HORIZON-CL4-2026-DATA-01" placeholder="Call ID or Proposal Title">
+    </div>
+
+    <!-- Consortium Stats Indicator -->
+    <div class="stats-badge-group">
+      <div class="stat-chip stat-count" id="header-country-count">0 Countries (0 EU / 0 Assoc)</div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button id="btn-theme-toggle" class="toolbar-btn" title="Toggle Theme">🌙</button>
+      <button id="btn-save-json" class="btn-secondary" title="Save Project Config to JSON">💾 Save Config</button>
+      <button id="btn-export-png" class="btn-primary" title="Export High Resolution Map Image">📸 Export Map</button>
+    </div>
+  </header>
+
+  <!-- Main Container Dual Pane -->
+  <div class="app-container">
+
+    <!-- Left Control Sidebar -->
+    <aside class="sidebar">
+      
+      <!-- Navigation Tabs -->
+      <nav class="sidebar-nav-tabs">
+        <button class="tab-btn active" data-tab="countries">🌍 Countries</button>
+        <button class="tab-btn" data-tab="roles">🎨 Roles & Colors</button>
+        <button class="tab-btn" data-tab="institutions">🏫 Institutions</button>
+        <button class="tab-btn" data-tab="export">⚙️ Export</button>
+      </nav>
+
+      <div class="tab-content-container">
+
+        <!-- Tab 1: Countries Selection -->
+        <div class="tab-pane active" id="tab-pane-countries">
+          
+          <!-- Search Box -->
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="country-search-input" placeholder="Search by country name or code (e.g. Germany, UK, CA)...">
+          </div>
+
+          <!-- Filter Chips -->
+          <div class="filter-chips">
+            <button class="chip-btn active" data-filter="all">All</button>
+            <button class="chip-btn" data-filter="eu27">EU27</button>
+            <button class="chip-btn" data-filter="associated">Associated</button>
+            <button class="chip-btn" data-filter="selected">Selected Only</button>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="quick-action-row">
+            <button class="btn-xs" id="btn-select-eu27">+ All EU27</button>
+            <button class="btn-xs" id="btn-select-assoc">+ All Associated</button>
+            <button class="btn-xs" id="btn-clear-all" style="color: var(--accent-rose);">✕ Clear</button>
+          </div>
+
+          <!-- Scrollable Country List -->
+          <div class="country-scroll-list" id="country-list-container">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Roles & Color Customization -->
+        <div class="tab-pane" id="tab-pane-roles">
+          <div class="section-card">
+            <div class="section-title">Consortium Role Colors</div>
+            
+            <div class="role-card">
+              <div class="role-meta">
+                <div class="color-picker-wrapper" style="background-color: #3b82f6;">
+                  <input type="color" class="color-picker-input" data-role="COORDINATOR" value="#3b82f6">
+                </div>
+                <div class="role-title">👑 Project Coordinator</div>
+              </div>
+              <input type="text" class="hex-code-input" id="hex-input-COORDINATOR" value="#3B82F6">
+            </div>
+
+            <div class="role-card">
+              <div class="role-meta">
+                <div class="color-picker-wrapper" style="background-color: #10b981;">
+                  <input type="color" class="color-picker-input" data-role="BENEFICIARY" value="#10b981">
+                </div>
+                <div class="role-title">🤝 Beneficiary (Partner)</div>
+              </div>
+              <input type="text" class="hex-code-input" id="hex-input-BENEFICIARY" value="#10B981">
+            </div>
+
+            <div class="role-card">
+              <div class="role-meta">
+                <div class="color-picker-wrapper" style="background-color: #8b5cf6;">
+                  <input type="color" class="color-picker-input" data-role="ASSOCIATED" value="#8b5cf6">
+                </div>
+                <div class="role-title">🔗 Associated Partner</div>
+              </div>
+              <input type="text" class="hex-code-input" id="hex-input-ASSOCIATED" value="#8B5CF6">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Institutions & Logos -->
+        <div class="tab-pane" id="tab-pane-institutions">
+          <div class="section-card">
+            <div class="section-title">Add Partner Institution</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">
+              Add partner institution names and upload logos to display badge overlays directly on the map.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+              <input type="text" id="inst-name-input" placeholder="Institution Full Name (e.g. Technical University of Munich)" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem;">
+              
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="inst-acronym-input" placeholder="Acronym (e.g. TUM)" style="flex: 1; padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">
+                
+                <select id="inst-country-select" style="flex: 1.5; padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem;">
+                  <!-- Populated dynamically by app.js -->
+                </select>
+              </div>
+
+              <!-- Logo Source Inputs -->
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+                <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Logo Image (File Upload or URL):</label>
+                <input type="file" id="inst-logo-file" accept="image/*" style="font-size: 0.75rem; color: var(--text-secondary);">
+                <input type="url" id="inst-logo-url" placeholder="or paste Image URL (https://...)" style="padding: 6px 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.78rem;">
+              </div>
+
+              <button class="btn-primary" style="justify-content: center; margin-top: 4px;" id="btn-add-inst">+ Add Partner Institution</button>
+            </div>
+          </div>
+
+          <div class="institution-list" id="institution-items-container" style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Export Settings -->
+        <div class="tab-pane" id="tab-pane-export">
+          <div class="section-card">
+            <div class="section-title">Export Settings</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 0.8rem; font-weight: 600;">Resolution Quality:</label>
+              <select id="export-scale-select" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary);">
+                <option value="1">1x Standard Web (1000px)</option>
+                <option value="2" selected>2x High Definition (2000px HD)</option>
+                <option value="4">4x Ultra HD Print Ready (4000px 300 DPI)</option>
+              </select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+              <button class="btn-primary" id="btn-export-png-tab" style="justify-content: center;">📸 Download High-Res PNG</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Right Map Viewport Stage -->
+    <main class="map-stage" id="map-stage-viewport">
+
+      <!-- Floating Canvas Control Toolbar (Excluded from PNG export) -->
+      <div class="floating-map-toolbar" data-html2canvas-ignore="true">
+        <button class="toolbar-btn" id="btn-zoom-in" title="Zoom In">+</button>
+        <button class="toolbar-btn" id="btn-zoom-out" title="Zoom Out">-</button>
+        <button class="toolbar-btn" id="btn-reset-view" title="Reset View">🧭</button>
+      </div>
+
+      <!-- Main SVG Vector Map Canvas -->
+      <svg id="map-svg" class="svg-map-canvas"></svg>
+
+      <!-- HTML Overlay Container for Institution Badges & Multi-Partner Stacks (Guarantees High-Res PNG Export) -->
+      <div id="logo-pins-overlay-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 40;"></div>
+
+      <!-- Inset Box Container for Distant Countries (Canada, NZ, S. Korea, etc.) -->
+      <div class="inset-boxes-wrapper" id="inset-boxes-container">
+        <!-- Dynamically rendered picture-in-picture callouts -->
+      </div>
+
+      <!-- Floating Dynamic Map Legend -->
+      <div class="map-legend-card" id="map-legend">
+        <!-- Dynamically rendered legend -->
+      </div>
+
+      <!-- Mouse Hover Tooltip -->
+      <div class="map-tooltip" id="map-tooltip"></div>
+
+    </main>
+
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/data/horizon_countries.js"></script>
+  <script src="js/data/world_geojson.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/logo_manager.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
