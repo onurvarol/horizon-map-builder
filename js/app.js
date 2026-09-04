@@ -119,6 +119,86 @@ document.addEventListener('DOMContentLoaded', () => {
     updateHeaderStats();
   };
 
+  // 2b. Distant Country Zoom Detail Modal Logic
+  const distantZoomModal = document.getElementById('distant-zoom-modal');
+  const distantModalClose = document.getElementById('distant-modal-close');
+
+  if (distantModalClose && distantZoomModal) {
+    distantModalClose.addEventListener('click', () => {
+      distantZoomModal.style.display = 'none';
+    });
+    distantZoomModal.addEventListener('click', (e) => {
+      if (e.target === distantZoomModal) {
+        distantZoomModal.style.display = 'none';
+      }
+    });
+  }
+
+  function openDistantCountryZoomModal(countryId) {
+    const countryObj = HORIZON_COUNTRIES.find(c => c.id === countryId);
+    if (!countryObj || !distantZoomModal) return;
+
+    const state = mapEngine.countryState[countryId] || { selected: true, roleId: 'BENEFICIARY' };
+    const role = mapEngine.activeRoles[state.roleId] || HORIZON_ROLES.BENEFICIARY;
+    const fillColor = state.customColor || role.color;
+    const insetData = DISTANT_INSET_SVG[countryId];
+
+    document.getElementById('distant-modal-flag').innerText = countryObj.flag;
+    document.getElementById('distant-modal-country-name').innerText = countryObj.name;
+    document.getElementById('distant-modal-code-tag').innerText = countryObj.id;
+
+    // Render zoomed SVG
+    const canvasContainer = document.getElementById('distant-zoom-canvas-container');
+    if (canvasContainer && insetData) {
+      canvasContainer.innerHTML = `
+        <svg viewBox="${insetData.viewBox}">
+          <path d="${insetData.path}" fill="${fillColor}" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" />
+        </svg>
+      `;
+    }
+
+    // Render body details
+    const bodyEl = document.getElementById('distant-modal-body');
+    if (bodyEl) {
+      const instList = logoManager.getInstitutionsForCountry(countryId);
+      let instHTML = '';
+      if (instList.length > 0) {
+        instHTML = `
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-top: 6px;">Partner Institutions (${instList.length}):</div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+        `;
+        instList.forEach(inst => {
+          instHTML += `
+            <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-primary); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);">
+              ${inst.logoData ? `<img src="${inst.logoData}" style="width: 22px; height: 22px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px;">` : '🏫'}
+              <div style="flex: 1;">
+                <div style="font-size: 0.82rem; font-weight: 700;">${inst.acronym}</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">${inst.name}</div>
+              </div>
+            </div>
+          `;
+        });
+        instHTML += `</div>`;
+      } else {
+        instHTML = `<div style="font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-top: 4px;">No partner institutions added yet for ${countryObj.name}.</div>`;
+      }
+
+      bodyEl.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <span style="font-size: 0.82rem; font-weight: 600;">Consortium Role:</span>
+          <span style="font-size: 0.82rem; font-weight: 700; color: ${fillColor}; padding: 3px 8px; background: rgba(255,255,255,0.06); border-radius: 4px;">${role.label}</span>
+        </div>
+        ${instHTML}
+      `;
+    }
+
+    distantZoomModal.style.display = 'flex';
+  }
+
+  mapEngine.onDistantCountryClickCallback = (countryId) => {
+    openDistantCountryZoomModal(countryId);
+  };
+
   // 3. Render Institution List in Sidebar Tab 3
   function renderInstitutionList() {
     if (!instItemsContainer) return;
@@ -313,7 +393,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (countEl) countEl.innerText = `${totalCount} Countries (${euCount} EU / ${assocCount} Assoc)`;
   }
 
-  // Export Actions
+  // Export & Config Actions
+  function saveProjectConfig() {
+    const acronym = document.getElementById('project-acronym-input')?.value || 'horizon';
+    const state = {
+      acronym: document.getElementById('project-acronym-input')?.value,
+      title: document.getElementById('project-title-input')?.value,
+      countryState: mapEngine.countryState,
+      roles: mapEngine.activeRoles,
+      institutions: logoManager.institutions
+    };
+    exportEngine.exportJSON(state, `${acronym}_map_config.json`);
+  }
+
   document.getElementById('btn-export-png')?.addEventListener('click', () => {
     const scale = parseInt(document.getElementById('export-scale-select')?.value || '2');
     const acronym = document.getElementById('project-acronym-input')?.value || 'horizon';
@@ -326,16 +418,96 @@ document.addEventListener('DOMContentLoaded', () => {
     exportEngine.exportPNG(scale, `${acronym}_consortium_map.png`);
   });
 
-  document.getElementById('btn-save-json')?.addEventListener('click', () => {
-    const acronym = document.getElementById('project-acronym-input')?.value || 'horizon';
-    const state = {
-      acronym: document.getElementById('project-acronym-input')?.value,
-      title: document.getElementById('project-title-input')?.value,
-      countryState: mapEngine.countryState,
-      roles: mapEngine.activeRoles,
-      institutions: logoManager.institutions
+  document.getElementById('btn-save-json')?.addEventListener('click', saveProjectConfig);
+  document.getElementById('btn-save-json-tab')?.addEventListener('click', saveProjectConfig);
+
+  // Load Config JSON Logic
+  const configFileFileInput = document.getElementById('config-file-input');
+
+  function triggerLoadConfig() {
+    if (configFileFileInput) {
+      configFileFileInput.click();
+    }
+  }
+
+  document.getElementById('btn-load-json')?.addEventListener('click', triggerLoadConfig);
+  document.getElementById('btn-load-json-tab')?.addEventListener('click', triggerLoadConfig);
+
+  configFileFileInput?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        
+        // 1. Restore Project Metadata
+        if (data.acronym !== undefined) {
+          const acrInput = document.getElementById('project-acronym-input');
+          if (acrInput) acrInput.value = data.acronym;
+        }
+        if (data.title !== undefined) {
+          const titleInput = document.getElementById('project-title-input');
+          if (titleInput) titleInput.value = data.title;
+        }
+
+        // 2. Restore Roles & Colors
+        if (data.roles) {
+          Object.keys(data.roles).forEach(rId => {
+            if (HORIZON_ROLES[rId]) {
+              HORIZON_ROLES[rId].color = data.roles[rId].color;
+              if (data.roles[rId].label) HORIZON_ROLES[rId].label = data.roles[rId].label;
+            }
+            if (mapEngine.activeRoles[rId]) {
+              mapEngine.activeRoles[rId].color = data.roles[rId].color;
+              if (data.roles[rId].label) mapEngine.activeRoles[rId].label = data.roles[rId].label;
+            }
+            // Update color pickers & hex inputs
+            const hexInput = document.getElementById(`hex-input-${rId}`);
+            if (hexInput) hexInput.value = data.roles[rId].color.toUpperCase();
+            const colorPicker = document.querySelector(`.color-picker-input[data-role="${rId}"]`);
+            if (colorPicker) colorPicker.value = data.roles[rId].color;
+          });
+        }
+
+        // 3. Restore Partner Institutions & Logos
+        if (Array.isArray(data.institutions)) {
+          logoManager.institutions = data.institutions;
+        }
+
+        // 4. Restore Country Selections
+        if (data.countryState) {
+          mapEngine.countryState = {};
+          HORIZON_COUNTRIES.forEach(c => {
+            const p = document.getElementById(`country-path-${c.id}`);
+            if (p) {
+              p.style.fill = 'var(--country-default)';
+              p.classList.remove('participating');
+            }
+          });
+          
+          Object.keys(data.countryState).forEach(cId => {
+            const st = data.countryState[cId];
+            mapEngine.updateCountryState(cId, st.selected, st.roleId, st.customColor);
+          });
+        }
+
+        // Re-render UI
+        renderCountryList();
+        renderInstitutionList();
+        mapEngine.renderLogoPins();
+        mapEngine.renderInsetBoxes();
+        mapEngine.updateLegend();
+        updateHeaderStats();
+
+        configFileFileInput.value = '';
+
+      } catch (err) {
+        alert('Failed to parse configuration JSON file: ' + err.message);
+      }
     };
-    exportEngine.exportJSON(state, `${acronym}_map_config.json`);
+    reader.readAsText(file);
   });
 
   // Toolbar actions
@@ -343,11 +515,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-zoom-out')?.addEventListener('click', () => mapEngine.zoom(1.15));
   document.getElementById('btn-reset-view')?.addEventListener('click', () => mapEngine.resetZoom());
 
-  // Dark/Light Theme Toggle
+  // Dark/Light Theme Toggle (Default to Light Theme)
   const themeBtn = document.getElementById('btn-theme-toggle');
   if (themeBtn) {
+    const initialTheme = document.body.getAttribute('data-theme') || 'light';
+    themeBtn.innerText = initialTheme === 'dark' ? '🌙' : '☀️';
+
     themeBtn.addEventListener('click', () => {
-      const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+      const currentTheme = document.body.getAttribute('data-theme') || 'light';
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       document.body.setAttribute('data-theme', newTheme);
       themeBtn.innerText = newTheme === 'dark' ? '🌙' : '☀️';

@@ -15,7 +15,7 @@
   <!-- Application Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body data-theme="dark">
+<body data-theme="light">
 
   <!-- Top App Header Banner -->
   <header class="app-header">
@@ -39,9 +39,11 @@
 
     <!-- Header Actions -->
     <div class="header-actions">
-      <button id="btn-theme-toggle" class="toolbar-btn" title="Toggle Theme">🌙</button>
+      <button id="btn-theme-toggle" class="toolbar-btn" title="Toggle Theme">☀️</button>
+      <button id="btn-load-json" class="btn-secondary" title="Load Project Config from JSON">📂 Load Config</button>
       <button id="btn-save-json" class="btn-secondary" title="Save Project Config to JSON">💾 Save Config</button>
       <button id="btn-export-png" class="btn-primary" title="Export High Resolution Map Image">📸 Export Map</button>
+      <input type="file" id="config-file-input" accept=".json,application/json" style="display: none;">
     </div>
   </header>
 
@@ -164,10 +166,10 @@
           </div>
         </div>
 
-        <!-- Tab 4: Export Settings -->
+        <!-- Tab 4: Export & Configuration -->
         <div class="tab-pane" id="tab-pane-export">
           <div class="section-card">
-            <div class="section-title">Export Settings</div>
+            <div class="section-title">Export Map Image</div>
             
             <div style="display: flex; flex-direction: column; gap: 6px;">
               <label style="font-size: 0.8rem; font-weight: 600;">Resolution Quality:</label>
@@ -180,6 +182,17 @@
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
               <button class="btn-primary" id="btn-export-png-tab" style="justify-content: center;">📸 Download High-Res PNG</button>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top: 12px;">
+            <div class="section-title">Project Configuration</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">
+              Save or load your complete project configuration (selected countries, partner roles, colors, and institution logos) as a JSON file.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <button class="btn-secondary" id="btn-save-json-tab" style="justify-content: center;">💾 Save Project Config JSON</button>
+              <button class="btn-secondary" id="btn-load-json-tab" style="justify-content: center;">📂 Load Project Config JSON</button>
             </div>
           </div>
         </div>
@@ -218,6 +231,26 @@
 
     </main>
 
+  <!-- Distant Country Zoom Detail Modal -->
+  <div class="modal-overlay" id="distant-zoom-modal">
+    <div class="modal-card distant-zoom-card">
+      <div class="modal-header">
+        <div class="distant-modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span id="distant-modal-flag" style="font-size: 1.5rem;">🇳🇿</span>
+          <h3 id="distant-modal-country-name" style="margin: 0;">New Zealand</h3>
+          <span id="distant-modal-code-tag" class="country-category-tag">NZ</span>
+        </div>
+        <button class="modal-close" id="distant-modal-close">✕</button>
+      </div>
+      
+      <div class="distant-zoom-canvas-wrapper" id="distant-zoom-canvas-container">
+        <!-- SVG zoomed vector map rendered dynamically -->
+      </div>
+      
+      <div class="distant-modal-body" id="distant-modal-body" style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Partner details rendered dynamically -->
+      </div>
+    </div>
   </div>
 
   <!-- Application Logic Scripts -->

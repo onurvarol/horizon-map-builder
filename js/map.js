@@ -224,13 +224,20 @@ class MapEngine {
           </div>
           <span style="font-size: 0.68rem; color: ${fillColor}; font-weight: 700;">${country.id}</span>
         </div>
-        <div class="inset-mini-canvas">
+        <div class="inset-mini-canvas" title="Click to zoom in on ${country.name}">
           <svg viewBox="${insetData.viewBox}">
             <path d="${insetData.path}" fill="${fillColor}" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" />
           </svg>
+          <div class="inset-zoom-badge">🔍 Zoom In</div>
         </div>
         ${instBadgeHTML}
       `;
+
+      card.addEventListener('click', () => {
+        if (this.onDistantCountryClickCallback) {
+          this.onDistantCountryClickCallback(country.id);
+        }
+      });
       
       this.insetContainer.appendChild(card);
     });
