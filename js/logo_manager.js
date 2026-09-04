@@ -6,13 +6,12 @@
 class LogoManager {
   constructor() {
     this.institutions = [
-      // Pre-populated default example institution for immediate visual feedback
       {
-        id: 'inst-default-1',
-        name: 'Technical University of Munich',
-        acronym: 'TUM',
-        countryId: 'DE',
-        logoData: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Logo_of_the_Technical_University_of_Munich.svg',
+        id: 'inst-default-su',
+        name: 'Sabancı University',
+        acronym: 'SU',
+        countryId: 'TR',
+        logoData: 'assets/sabanci-icon.jpg',
         badgeStyle: 'circle'
       }
     ];

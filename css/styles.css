@@ -349,6 +349,23 @@ h1, h2, h3, h4, .brand-title {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.tab-pane select,
+.tab-pane input {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#inst-country-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
 }
 
 .section-title {

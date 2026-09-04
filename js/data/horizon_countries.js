@@ -4,9 +4,9 @@
  */
 
 const HORIZON_ROLES = {
-  COORDINATOR: { id: 'COORDINATOR', label: '👑 Project Coordinator', color: '#3b82f6' },
-  BENEFICIARY: { id: 'BENEFICIARY', label: '🤝 Beneficiary (Partner)', color: '#10b981' },
-  ASSOCIATED:  { id: 'ASSOCIATED',  label: '🔗 Associated Partner',  color: '#8b5cf6' }
+  COORDINATOR: { id: 'COORDINATOR', label: 'Project Coordinator', color: '#3b82f6' },
+  BENEFICIARY: { id: 'BENEFICIARY', label: 'Beneficiary (Partner)', color: '#10b981' },
+  ASSOCIATED:  { id: 'ASSOCIATED',  label: 'Associated Partner',  color: '#8b5cf6' }
 };
 
 const HORIZON_COUNTRIES = [
@@ -54,15 +54,15 @@ const HORIZON_COUNTRIES = [
   { id: 'NO', iso3: 'NOR', name: 'Norway', flag: '🇳🇴', category: 'associated', centroid: [8.46, 60.47] },
   { id: 'RS', iso3: 'SRB', name: 'Serbia', flag: '🇷🇸', category: 'associated', centroid: [21.00, 44.01] },
   { id: 'TN', iso3: 'TUN', name: 'Tunisia', flag: '🇹🇳', category: 'associated', centroid: [9.53, 33.88] },
-  { id: 'TR', iso3: 'TUR', name: 'Turkey', flag: '🇹🇷', category: 'associated', centroid: [35.24, 38.96] },
+  { id: 'TR', iso3: 'TUR', name: 'Türkiye', flag: '🇹🇷', category: 'associated', centroid: [35.24, 38.96] },
   { id: 'UA', iso3: 'UKR', name: 'Ukraine', flag: '🇺🇦', category: 'associated', centroid: [31.16, 48.37] },
   { id: 'GB', iso3: 'GBR', name: 'United Kingdom', flag: '🇬🇧', category: 'associated', centroid: [-3.43, 55.37] },
   { id: 'CH', iso3: 'CHE', name: 'Switzerland', flag: '🇨🇭', category: 'associated', centroid: [8.22, 46.81] },
 
   // --- Distant Associated & Third Countries (Trigger Inset Boxes) ---
-  { id: 'CA', iso3: 'CAN', name: 'Canada (Pillar II)', flag: '🇨🇦', category: 'associated', isDistant: true, centroid: [-106.34, 56.13] },
-  { id: 'NZ', iso3: 'NZL', name: 'New Zealand (Pillar II)', flag: '🇳🇿', category: 'associated', isDistant: true, centroid: [174.88, -40.90] },
-  { id: 'KR', iso3: 'KOR', name: 'South Korea (Pillar II)', flag: '🇰🇷', category: 'associated', isDistant: true, centroid: [127.76, 35.90] },
+  { id: 'CA', iso3: 'CAN', name: 'Canada', flag: '🇨🇦', category: 'associated', isDistant: true, centroid: [-106.34, 56.13] },
+  { id: 'NZ', iso3: 'NZL', name: 'New Zealand', flag: '🇳🇿', category: 'associated', isDistant: true, centroid: [174.88, -40.90] },
+  { id: 'KR', iso3: 'KOR', name: 'South Korea', flag: '🇰🇷', category: 'associated', isDistant: true, centroid: [127.76, 35.90] },
   { id: 'US', iso3: 'USA', name: 'United States', flag: '🇺🇸', category: 'third', isDistant: true, centroid: [-95.71, 37.09] },
   { id: 'JP', iso3: 'JPN', name: 'Japan', flag: '🇯🇵', category: 'third', isDistant: true, centroid: [138.25, 36.20] },
   { id: 'AU', iso3: 'AUS', name: 'Australia', flag: '🇦🇺', category: 'third', isDistant: true, centroid: [133.77, -25.27] },

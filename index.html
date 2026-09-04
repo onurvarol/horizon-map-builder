@@ -101,7 +101,7 @@
                 <div class="color-picker-wrapper" style="background-color: #3b82f6;">
                   <input type="color" class="color-picker-input" data-role="COORDINATOR" value="#3b82f6">
                 </div>
-                <div class="role-title">👑 Project Coordinator</div>
+                <div class="role-title">Project Coordinator</div>
               </div>
               <input type="text" class="hex-code-input" id="hex-input-COORDINATOR" value="#3B82F6">
             </div>
@@ -111,7 +111,7 @@
                 <div class="color-picker-wrapper" style="background-color: #10b981;">
                   <input type="color" class="color-picker-input" data-role="BENEFICIARY" value="#10b981">
                 </div>
-                <div class="role-title">🤝 Beneficiary (Partner)</div>
+                <div class="role-title">Beneficiary (Partner)</div>
               </div>
               <input type="text" class="hex-code-input" id="hex-input-BENEFICIARY" value="#10B981">
             </div>
@@ -121,7 +121,7 @@
                 <div class="color-picker-wrapper" style="background-color: #8b5cf6;">
                   <input type="color" class="color-picker-input" data-role="ASSOCIATED" value="#8b5cf6">
                 </div>
-                <div class="role-title">🔗 Associated Partner</div>
+                <div class="role-title">Associated Partner</div>
               </div>
               <input type="text" class="hex-code-input" id="hex-input-ASSOCIATED" value="#8B5CF6">
             </div>
@@ -137,21 +137,22 @@
             </p>
             
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
-              <input type="text" id="inst-name-input" placeholder="Institution Full Name (e.g. Technical University of Munich)" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem;">
+              <input type="text" id="inst-name-input" placeholder="Institution Full Name (e.g. Sabancı University)" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; width: 100%; box-sizing: border-box;">
               
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="inst-acronym-input" placeholder="Acronym (e.g. TUM)" style="flex: 1; padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">
-                
-                <select id="inst-country-select" style="flex: 1.5; padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem;">
+              <input type="text" id="inst-acronym-input" placeholder="Acronym (e.g. SU)" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; width: 100%; box-sizing: border-box;">
+              
+              <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+                <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Partner Country:</label>
+                <select id="inst-country-select" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; width: 100%; max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; outline: none;">
                   <!-- Populated dynamically by app.js -->
                 </select>
               </div>
 
               <!-- Logo Source Inputs -->
-              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px; width: 100%;">
                 <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Logo Image (File Upload or URL):</label>
-                <input type="file" id="inst-logo-file" accept="image/*" style="font-size: 0.75rem; color: var(--text-secondary);">
-                <input type="url" id="inst-logo-url" placeholder="or paste Image URL (https://...)" style="padding: 6px 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.78rem;">
+                <input type="file" id="inst-logo-file" accept="image/*" style="font-size: 0.75rem; color: var(--text-secondary); width: 100%; max-width: 100%; box-sizing: border-box;">
+                <input type="url" id="inst-logo-url" placeholder="or paste Image URL (https://...)" style="padding: 6px 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.78rem; width: 100%; box-sizing: border-box;">
               </div>
 
               <button class="btn-primary" style="justify-content: center; margin-top: 4px;" id="btn-add-inst">+ Add Partner Institution</button>

@@ -73,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
           ${country.isDistant ? '<span title="Renders as Inset Card" style="font-size: 11px;">📦</span>' : ''}
         </div>
         <select class="country-role-select" data-id="${country.id}" ${!st.selected ? 'disabled' : ''}>
-          <option value="COORDINATOR" ${st.roleId === 'COORDINATOR' ? 'selected' : ''}>👑 Coord</option>
-          <option value="BENEFICIARY" ${st.roleId === 'BENEFICIARY' ? 'selected' : ''}>🤝 Partner</option>
-          <option value="ASSOCIATED" ${st.roleId === 'ASSOCIATED' ? 'selected' : ''}>🔗 Assoc</option>
+          <option value="COORDINATOR" ${st.roleId === 'COORDINATOR' ? 'selected' : ''}>Coord</option>
+          <option value="BENEFICIARY" ${st.roleId === 'BENEFICIARY' ? 'selected' : ''}>Partner</option>
+          <option value="ASSOCIATED" ${st.roleId === 'ASSOCIATED' ? 'selected' : ''}>Assoc</option>
         </select>
       `;
       
@@ -356,8 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial renders
   populateCountryDropdowns();
-  // Activate default institution in Munich, DE
-  mapEngine.updateCountryState('DE', true, 'COORDINATOR');
+  // Activate default institution in Sabancı University, TR
+  mapEngine.updateCountryState('TR', true, 'COORDINATOR');
   renderCountryList();
   renderInstitutionList();
   updateHeaderStats();

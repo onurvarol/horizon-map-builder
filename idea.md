@@ -20,7 +20,7 @@ The map includes pre-configured presets for all eligible country categories unde
 `Austria (AT)`, `Belgium (BE)`, `Bulgaria (BG)`, `Croatia (HR)`, `Cyprus (CY)`, `Czechia (CZ)`, `Denmark (DK)`, `Estonia (EE)`, `Finland (FI)`, `France (FR)`, `Germany (DE)`, `Greece (GR)`, `Hungary (HU)`, `Ireland (IE)`, `Italy (IT)`, `Latvia (LV)`, `Lithuania (LT)`, `Luxembourg (LU)`, `Malta (MT)`, `Netherlands (NL)`, `Poland (PL)`, `Portugal (PT)`, `Romania (RO)`, `Slovakia (SK)`, `Slovenia (SI)`, `Spain (ES)`, `Sweden (SE)`
 
 ### 2. Associated Countries (Horizon Europe Framework)
-`Albania (AL)`, `Armenia (AM)`, `Bosnia and Herzegovina (BA)`, `Faroe Islands (FO)`, `Georgia (GE)`, `Iceland (IS)`, `Israel (IL)`, `Kosovo (XK)`, `Moldova (MD)`, `Montenegro (ME)`, `North Macedonia (MK)`, `Norway (NO)`, `Serbia (RS)`, `Tunisia (TN)`, `Turkey (TR)`, `Ukraine (UA)`, `United Kingdom (GB)`, `New Zealand (NZ - Pillar II)`, `Canada (CA - Pillar II)`, `South Korea (KR - Pillar II)`
+`Albania (AL)`, `Armenia (AM)`, `Bosnia and Herzegovina (BA)`, `Faroe Islands (FO)`, `Georgia (GE)`, `Iceland (IS)`, `Israel (IL)`, `Kosovo (XK)`, `Moldova (MD)`, `Montenegro (ME)`, `North Macedonia (MK)`, `Norway (NO)`, `Serbia (RS)`, `Tunisia (TN)`, `Türkiye (TR)`, `Ukraine (UA)`, `United Kingdom (GB)`, `New Zealand (NZ)`, `Canada (CA)`, `South Korea (KR)`
 
 ### 3. Non-Associated / Third Countries
 Option to enable and highlight global partner countries participating with custom co-funding or specific call eligibility.
