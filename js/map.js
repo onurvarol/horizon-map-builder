@@ -146,8 +146,17 @@ class MapEngine {
       
       const card = document.createElement('div');
       card.className = 'country-logo-stack-badge';
-      card.style.left = `${leftPct}%`;
-      card.style.top = `${topPct}%`;
+      
+      // Position card: use saved custom offset or default centroid percentage
+      if (state && state.customOffset) {
+        card.style.left = state.customOffset.left;
+        card.style.top = state.customOffset.top;
+        card.style.transform = 'none';
+      } else {
+        card.style.left = `${leftPct}%`;
+        card.style.top = `${topPct}%`;
+        card.style.transform = 'translate(-50%, -100%)';
+      }
       
       let rowsHTML = '';
       instList.forEach(inst => {
@@ -168,11 +177,17 @@ class MapEngine {
       
       card.innerHTML = `
         <div class="stack-badge-header">
-          <span>${countryObj.flag} ${countryObj.name}</span>
+          <span><span class="drag-handle-icon" title="Drag to reposition">⋮⋮</span> ${countryObj.flag} ${countryObj.name}</span>
           ${countBadge}
         </div>
         ${rowsHTML}
       `;
+      
+      // Make partner badge card draggable
+      this.makeElementDraggable(card, (left, top) => {
+        if (!this.countryState[countryId]) this.countryState[countryId] = { selected: true };
+        this.countryState[countryId].customOffset = { left, top };
+      });
       
       overlayContainer.appendChild(card);
     });
@@ -199,6 +214,13 @@ class MapEngine {
       card.className = 'inset-card';
       card.setAttribute('data-id', country.id);
       
+      if (state && state.customOffset) {
+        card.style.position = 'absolute';
+        card.style.left = state.customOffset.left;
+        card.style.top = state.customOffset.top;
+        card.style.transform = 'none';
+      }
+      
       // Get institutions for this country
       const instList = this.logoManager ? this.logoManager.getInstitutionsForCountry(country.id) : [];
       let instBadgeHTML = '';
@@ -219,6 +241,7 @@ class MapEngine {
       card.innerHTML = `
         <div class="inset-card-header">
           <div class="inset-flag-name">
+            <span class="drag-handle-icon" title="Drag to reposition">⋮⋮</span>
             <span>${country.flag}</span>
             <span>${country.name}</span>
           </div>
@@ -233,14 +256,126 @@ class MapEngine {
         ${instBadgeHTML}
       `;
 
-      card.addEventListener('click', () => {
-        if (this.onDistantCountryClickCallback) {
-          this.onDistantCountryClickCallback(country.id);
-        }
+      // Handle clicking mini-canvas for zoom modal
+      const miniCanvas = card.querySelector('.inset-mini-canvas');
+      if (miniCanvas) {
+        miniCanvas.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (this.onDistantCountryClickCallback) {
+            this.onDistantCountryClickCallback(country.id);
+          }
+        });
+      }
+
+      // Make inset card draggable
+      this.makeElementDraggable(card, (left, top) => {
+        if (!this.countryState[country.id]) this.countryState[country.id] = { selected: true };
+        this.countryState[country.id].customOffset = { left, top };
       });
       
       this.insetContainer.appendChild(card);
     });
+  }
+
+  /**
+   * Helper method to make DOM elements draggable relative to their container
+   */
+  makeElementDraggable(element, onDragEndCallback, onClickCallback) {
+    let startX = 0, startY = 0;
+    let initialLeft = 0, initialTop = 0;
+    let isDragging = false;
+    let hasMoved = false;
+
+    const dragHandle = element.querySelector('.drag-handle-icon') || 
+                       element.querySelector('.stack-badge-header') || 
+                       element.querySelector('.inset-card-header') || 
+                       element.querySelector('.legend-title') || 
+                       element;
+
+    dragHandle.style.cursor = 'grab';
+
+    const onMouseDown = (e) => {
+      if (e.target.closest('button, select, input, a, .inset-mini-canvas')) {
+        return;
+      }
+
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX || (e.touches && e.touches[0].clientX);
+      startY = e.clientY || (e.touches && e.touches[0].clientY);
+
+      const parentEl = element.offsetParent || document.body;
+      const parentRect = parentEl.getBoundingClientRect();
+      const rect = element.getBoundingClientRect();
+
+      initialLeft = rect.left - parentRect.left;
+      initialTop = rect.top - parentRect.top;
+
+      element.style.position = 'absolute';
+      element.style.left = `${initialLeft}px`;
+      element.style.top = `${initialTop}px`;
+      element.style.transform = 'none';
+      element.style.zIndex = '100';
+      element.classList.add('is-dragging');
+      dragHandle.style.cursor = 'grabbing';
+
+      const onMouseMove = (moveEvt) => {
+        if (!isDragging) return;
+
+        const currentX = moveEvt.clientX || (moveEvt.touches && moveEvt.touches[0].clientX);
+        const currentY = moveEvt.clientY || (moveEvt.touches && moveEvt.touches[0].clientY);
+
+        const dx = currentX - startX;
+        const dy = currentY - startY;
+
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          hasMoved = true;
+          if (moveEvt.preventDefault) moveEvt.preventDefault();
+        }
+
+        let newLeft = initialLeft + dx;
+        let newTop = initialTop + dy;
+
+        newLeft = Math.max(0, Math.min(newLeft, parentRect.width - rect.width));
+        newTop = Math.max(0, Math.min(newTop, parentRect.height - rect.height));
+
+        const leftPct = ((newLeft / parentRect.width) * 100).toFixed(2);
+        const topPct = ((newTop / parentRect.height) * 100).toFixed(2);
+
+        element.style.left = `${leftPct}%`;
+        element.style.top = `${topPct}%`;
+      };
+
+      const onMouseUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        element.classList.remove('is-dragging');
+        dragHandle.style.cursor = 'grab';
+
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+        window.removeEventListener('touchmove', onMouseMove);
+        window.removeEventListener('touchend', onMouseUp);
+
+        if (hasMoved) {
+          if (onDragEndCallback) {
+            onDragEndCallback(element.style.left, element.style.top);
+          }
+        } else {
+          if (onClickCallback) {
+            onClickCallback();
+          }
+        }
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('touchmove', onMouseMove, { passive: false });
+      window.addEventListener('touchend', onMouseUp);
+    };
+
+    dragHandle.addEventListener('mousedown', onMouseDown);
+    dragHandle.addEventListener('touchstart', onMouseDown, { passive: true });
   }
 
   /**
@@ -260,7 +395,7 @@ class MapEngine {
       }
     });
     
-    let html = `<div class="legend-title">Project Legend (${totalSelected} Countries)</div>`;
+    let html = `<div class="legend-title"><span class="drag-handle-icon" title="Drag to reposition">⋮⋮</span> Project Legend (${totalSelected} Countries)</div>`;
     
     if (rolesInUse.size === 0) {
       html += `<div style="font-size: 0.75rem; color: var(--text-muted);">No countries selected yet. Select countries from the sidebar.</div>`;
@@ -293,6 +428,9 @@ class MapEngine {
     }
     
     this.legend.innerHTML = html;
+
+    // Make legend card draggable
+    this.makeElementDraggable(this.legend);
   }
 
   handleMouseEnter(event, country) {

@@ -253,6 +253,55 @@
     </div>
   </div>
 
+  <!-- Edit Partner Institution Modal -->
+  <div class="modal-overlay" id="edit-inst-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">✏️ Edit Partner Institution</h3>
+        <button class="modal-close" id="edit-inst-modal-close">✕</button>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <input type="hidden" id="edit-inst-id">
+        
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Institution Full Name:</label>
+          <input type="text" id="edit-inst-name-input" placeholder="Full Name" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; width: 100%; box-sizing: border-box; margin-top: 4px;">
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Acronym:</label>
+          <input type="text" id="edit-inst-acronym-input" placeholder="Acronym (e.g. SU)" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; width: 100%; box-sizing: border-box; margin-top: 4px;">
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Partner Country:</label>
+          <select id="edit-inst-country-select" style="padding: 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.8rem; width: 100%; box-sizing: border-box; margin-top: 4px;">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Current Logo:</label>
+          <div id="edit-inst-logo-preview" style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding: 6px 10px; background: var(--bg-primary); border-radius: 4px; border: 1px solid var(--border-color);">
+            <!-- Preview rendered dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">Replace Logo Image (File Upload or URL):</label>
+          <input type="file" id="edit-inst-logo-file" accept="image/*" style="font-size: 0.75rem; color: var(--text-secondary); width: 100%; box-sizing: border-box; margin-top: 4px;">
+          <input type="url" id="edit-inst-logo-url" placeholder="or paste Image URL (https://...)" style="padding: 6px 8px; border-radius: 4px; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 0.78rem; width: 100%; box-sizing: border-box; margin-top: 4px;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+          <button class="btn-secondary" id="btn-cancel-edit-inst">Cancel</button>
+          <button class="btn-primary" id="btn-save-edit-inst">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Application Logic Scripts -->
   <script src="js/data/horizon_countries.js"></script>
   <script src="js/data/world_geojson.js"></script>

@@ -33,6 +33,24 @@ class LogoManager {
     return newInst;
   }
 
+  updateInstitution(instId, updatedFields) {
+    const inst = this.institutions.find(i => i.id === instId);
+    if (!inst) return null;
+    
+    if (updatedFields.name !== undefined) inst.name = updatedFields.name;
+    if (updatedFields.acronym !== undefined) inst.acronym = updatedFields.acronym;
+    if (updatedFields.countryId !== undefined) inst.countryId = updatedFields.countryId;
+    if (updatedFields.logoData !== undefined) inst.logoData = updatedFields.logoData;
+    if (updatedFields.badgeStyle !== undefined) inst.badgeStyle = updatedFields.badgeStyle;
+    
+    if (this.onUpdateCallback) this.onUpdateCallback(this.institutions);
+    return inst;
+  }
+
+  getInstitution(instId) {
+    return this.institutions.find(i => i.id === instId) || null;
+  }
+
   removeInstitution(instId) {
     this.institutions = this.institutions.filter(i => i.id !== instId);
     if (this.onUpdateCallback) this.onUpdateCallback(this.institutions);

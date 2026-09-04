@@ -23,13 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 1. Populate Country Dropdowns
   function populateCountryDropdowns() {
-    if (!instCountrySelect) return;
-    instCountrySelect.innerHTML = '';
-    HORIZON_COUNTRIES.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = `${c.flag} ${c.name} (${c.id})`;
-      instCountrySelect.appendChild(opt);
+    const editInstCountrySelect = document.getElementById('edit-inst-country-select');
+    [instCountrySelect, editInstCountrySelect].forEach(selectEl => {
+      if (!selectEl) return;
+      selectEl.innerHTML = '';
+      HORIZON_COUNTRIES.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.flag} ${c.name} (${c.id})`;
+        selectEl.appendChild(opt);
+      });
     });
   }
 
@@ -199,6 +202,45 @@ document.addEventListener('DOMContentLoaded', () => {
     openDistantCountryZoomModal(countryId);
   };
 
+  /**
+   * Compress and resize uploaded logo files using an offscreen Canvas
+   * to keep JSON configuration sizes small (~20-40KB) and prevent config bloat.
+   */
+  function processLogoFile(file, maxWidth = 300, maxHeight = 300) {
+    return new Promise((resolve) => {
+      if (!file) return resolve(null);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            } else {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => resolve(e.target.result); // Fallback to raw data URL
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
   // 3. Render Institution List in Sidebar Tab 3
   function renderInstitutionList() {
     if (!instItemsContainer) return;
@@ -224,9 +266,16 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="inst-name">${inst.name}</div>
           <div class="inst-country">${countryObj.flag} ${countryObj.name} (${inst.acronym})</div>
         </div>
-        <button class="btn-xs btn-remove-inst" data-id="${inst.id}" style="color: var(--accent-rose);">🗑️</button>
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <button class="btn-xs btn-edit-inst" data-id="${inst.id}" title="Edit Institution" style="padding: 4px 6px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); cursor: pointer;">✏️</button>
+          <button class="btn-xs btn-remove-inst" data-id="${inst.id}" title="Remove Institution" style="padding: 4px 6px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; color: var(--accent-rose); cursor: pointer;">🗑️</button>
+        </div>
       `;
       
+      card.querySelector('.btn-edit-inst').addEventListener('click', () => {
+        openEditInstitutionModal(inst.id);
+      });
+
       card.querySelector('.btn-remove-inst').addEventListener('click', () => {
         logoManager.removeInstitution(inst.id);
       });
@@ -243,10 +292,102 @@ document.addEventListener('DOMContentLoaded', () => {
     mapEngine.updateLegend();
   };
 
+  // Edit Institution Modal Logic
+  const editInstModal = document.getElementById('edit-inst-modal');
+  const editInstModalClose = document.getElementById('edit-inst-modal-close');
+  const btnCancelEditInst = document.getElementById('btn-cancel-edit-inst');
+  const btnSaveEditInst = document.getElementById('btn-save-edit-inst');
+  let currentEditingLogoData = null;
+
+  function openEditInstitutionModal(instId) {
+    const inst = logoManager.getInstitution(instId);
+    if (!inst || !editInstModal) return;
+
+    document.getElementById('edit-inst-id').value = inst.id;
+    document.getElementById('edit-inst-name-input').value = inst.name;
+    document.getElementById('edit-inst-acronym-input').value = inst.acronym;
+    
+    const countrySelect = document.getElementById('edit-inst-country-select');
+    if (countrySelect) countrySelect.value = inst.countryId;
+
+    document.getElementById('edit-inst-logo-file').value = '';
+    document.getElementById('edit-inst-logo-url').value = '';
+    currentEditingLogoData = inst.logoData;
+
+    renderEditLogoPreview();
+    editInstModal.style.display = 'flex';
+  }
+
+  function renderEditLogoPreview() {
+    const previewContainer = document.getElementById('edit-inst-logo-preview');
+    if (!previewContainer) return;
+
+    if (currentEditingLogoData) {
+      previewContainer.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <img src="${currentEditingLogoData}" style="width: 28px; height: 28px; object-fit: contain; border-radius: 4px; background: #fff; padding: 2px;">
+          <span style="font-size: 0.75rem; color: var(--text-primary);">Logo attached</span>
+        </div>
+        <button type="button" id="btn-remove-edit-logo" style="padding: 2px 6px; font-size: 0.72rem; color: var(--accent-rose); background: transparent; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">Remove Logo</button>
+      `;
+      document.getElementById('btn-remove-edit-logo')?.addEventListener('click', () => {
+        currentEditingLogoData = null;
+        renderEditLogoPreview();
+      });
+    } else {
+      previewContainer.innerHTML = `<span style="font-size: 0.75rem; color: var(--text-muted);">No logo attached (acronym avatar will be used)</span>`;
+    }
+  }
+
+  function closeEditInstitutionModal() {
+    if (editInstModal) editInstModal.style.display = 'none';
+  }
+
+  if (editInstModalClose) editInstModalClose.addEventListener('click', closeEditInstitutionModal);
+  if (btnCancelEditInst) btnCancelEditInst.addEventListener('click', closeEditInstitutionModal);
+
+  if (btnSaveEditInst) {
+    btnSaveEditInst.addEventListener('click', async () => {
+      const instId = document.getElementById('edit-inst-id').value;
+      const name = document.getElementById('edit-inst-name-input').value.trim();
+      const acronym = document.getElementById('edit-inst-acronym-input').value.trim();
+      const countryId = document.getElementById('edit-inst-country-select').value;
+      const fileInput = document.getElementById('edit-inst-logo-file');
+      const urlInput = document.getElementById('edit-inst-logo-url').value.trim();
+
+      if (!name) {
+        alert('Please enter an institution name.');
+        return;
+      }
+
+      let logoData = currentEditingLogoData;
+
+      if (fileInput.files && fileInput.files[0]) {
+        logoData = await processLogoFile(fileInput.files[0]);
+      } else if (urlInput) {
+        logoData = urlInput;
+      }
+
+      logoManager.updateInstitution(instId, {
+        name,
+        acronym: acronym || name.substring(0, 5).toUpperCase(),
+        countryId,
+        logoData
+      });
+
+      // Ensure country is selected on the map
+      mapEngine.updateCountryState(countryId, true, 'BENEFICIARY');
+      renderCountryList();
+      updateHeaderStats();
+
+      closeEditInstitutionModal();
+    });
+  }
+
   // 4. Add Institution Form Submission
   const btnAddInst = document.getElementById('btn-add-inst');
   if (btnAddInst) {
-    btnAddInst.addEventListener('click', () => {
+    btnAddInst.addEventListener('click', async () => {
       const nameInput = document.getElementById('inst-name-input');
       const acronymInput = document.getElementById('inst-acronym-input');
       const countrySelect = document.getElementById('inst-country-select');
@@ -267,29 +408,18 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCountryList();
       updateHeaderStats();
       
-      // Check file upload first
+      let logoData = urlInput.value.trim() || null;
       if (fileInput.files && fileInput.files[0]) {
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const logoData = e.target.result;
-          logoManager.addInstitution(name, acronym, countryId, logoData);
-          // Clear inputs
-          nameInput.value = '';
-          acronymInput.value = '';
-          fileInput.value = '';
-          urlInput.value = '';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        const logoData = urlInput.value.trim() || null;
-        logoManager.addInstitution(name, acronym, countryId, logoData);
-        // Clear inputs
-        nameInput.value = '';
-        acronymInput.value = '';
-        fileInput.value = '';
-        urlInput.value = '';
+        logoData = await processLogoFile(fileInput.files[0]);
       }
+      
+      logoManager.addInstitution(name, acronym, countryId, logoData);
+      
+      // Clear inputs
+      nameInput.value = '';
+      acronymInput.value = '';
+      fileInput.value = '';
+      urlInput.value = '';
     });
   }
 

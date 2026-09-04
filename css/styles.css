@@ -1090,3 +1090,39 @@ h1, h2, h3, h4, .brand-title {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* Draggable Cards & Modals Visual Styling */
+.drag-handle-icon {
+  display: inline-block;
+  cursor: grab;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-right: 4px;
+  font-weight: 700;
+  user-select: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.drag-handle-icon:hover {
+  opacity: 1;
+  color: var(--text-primary);
+}
+
+.country-logo-stack-badge,
+.inset-card,
+.map-legend-card {
+  user-select: none;
+  touch-action: none;
+}
+
+.is-dragging {
+  opacity: 0.92;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4) !important;
+  cursor: grabbing !important;
+  z-index: 150 !important;
+}
+
+.is-dragging .drag-handle-icon {
+  cursor: grabbing !important;
+  color: var(--eu-gold);
+}
