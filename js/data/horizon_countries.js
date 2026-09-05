@@ -4,7 +4,7 @@
  */
 
 const HORIZON_ROLES = {
-  COORDINATOR: { id: 'COORDINATOR', label: 'Project Coordinator', color: '#3b82f6' },
+  COORDINATOR: { id: 'COORDINATOR', label: 'Project Coordinator', color: '#003399' },
   BENEFICIARY: { id: 'BENEFICIARY', label: 'Beneficiary (Partner)', color: '#10b981' },
   ASSOCIATED:  { id: 'ASSOCIATED',  label: 'Associated Partner',  color: '#8b5cf6' }
 };

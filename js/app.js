@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoManager = new LogoManager();
   const exportEngine = new ExportEngine('map-stage-viewport');
 
+  const projectTour = typeof ProjectTour !== 'undefined' ? new ProjectTour() : null;
+
   // Attach logo manager & map engine
   mapEngine.logoManager = logoManager;
   exportEngine.mapEngine = mapEngine;
@@ -16,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.mapEngine = mapEngine;
   window.logoManager = logoManager;
   window.exportEngine = exportEngine;
+  window.projectTour = projectTour;
+
+  // Tour button listener
+  document.getElementById('btn-start-tour')?.addEventListener('click', () => {
+    if (projectTour) projectTour.start();
+  });
 
   // UI Element References
   const searchInput = document.getElementById('country-search-input');

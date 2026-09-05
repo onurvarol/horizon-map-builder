@@ -13,6 +13,9 @@
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+  <!-- Driver.js for Guided Tour -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css">
+
   <!-- Application Styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -21,9 +24,11 @@
   <!-- Top App Header Banner -->
   <header class="app-header">
     <div class="brand-section">
-      <div class="brand-icon">🇪🇺</div>
+      <div class="brand-icon" style="background: transparent; border: none; padding: 0;">
+        <img src="assets/horizon-europe-logo.jpg" alt="Horizon Europe Logo" class="brand-icon-img" style="height: 38px; width: auto; border-radius: 4px; object-fit: contain;">
+      </div>
       <div class="brand-title">
-        Horizon Europe <span style="font-weight: 400; opacity: 0.8;">Map Builder</span>
+        Horizon Europe <span style="font-weight: bold; color: var(--eu-gold);">Map Builder</span>
       </div>
     </div>
 
@@ -40,6 +45,7 @@
 
     <!-- Header Actions -->
     <div class="header-actions">
+      <button id="btn-start-tour" class="toolbar-btn" title="Interactive Guided Tour" style="font-size: 0.8rem; font-weight: 600; padding: 6px 10px;">❓ Quick Tour</button>
       <button id="btn-theme-toggle" class="toolbar-btn" title="Toggle Theme">☀️</button>
       <button id="btn-load-json" class="btn-secondary" title="Load Project Config from JSON">📂 Load Config</button>
       <button id="btn-save-json" class="btn-secondary" title="Save Project Config to JSON">💾 Save Config</button>
@@ -101,12 +107,12 @@
             
             <div class="role-card">
               <div class="role-meta">
-                <div class="color-picker-wrapper" style="background-color: #3b82f6;">
-                  <input type="color" class="color-picker-input" data-role="COORDINATOR" value="#3b82f6">
+                <div class="color-picker-wrapper" style="background-color: #003399;">
+                  <input type="color" class="color-picker-input" data-role="COORDINATOR" value="#003399">
                 </div>
                 <div class="role-title">Project Coordinator</div>
               </div>
-              <input type="text" class="hex-code-input" id="hex-input-COORDINATOR" value="#3B82F6">
+              <input type="text" class="hex-code-input" id="hex-input-COORDINATOR" value="#003399">
             </div>
 
             <div class="role-card">
@@ -304,11 +310,13 @@
   </div>
 
   <!-- Application Logic Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
   <script src="js/data/horizon_countries.js"></script>
   <script src="js/data/world_geojson.js"></script>
   <script src="js/map.js"></script>
   <script src="js/logo_manager.js"></script>
   <script src="js/export.js"></script>
+  <script src="js/tour.js"></script>
   <script src="js/app.js"></script>
 
 </body>

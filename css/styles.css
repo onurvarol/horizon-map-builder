@@ -16,16 +16,16 @@
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   
-  /* Brand Colors */
-  --eu-blue: #2563eb;
-  --eu-gold: #f59e0b;
+  /* Brand Colors (#003399 EU Reflex Blue & #FFCC00 EU Gold) */
+  --eu-blue: #003399;
+  --eu-gold: #FFCC00;
   --accent-cyan: #06b6d4;
   --accent-emerald: #10b981;
   --accent-violet: #8b5cf6;
   --accent-rose: #f43f5e;
   
   /* Role Presets */
-  --role-coord: #3b82f6;   /* Project Coordinator */
+  --role-coord: #003399;   /* Project Coordinator */
   --role-benef: #10b981;   /* Beneficiary / Partner */
   --role-wplead: #f59e0b;  /* WP Leader */
   --role-assoc: #8b5cf6;   /* Associated Partner */
@@ -136,7 +136,8 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: bold;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   height: 100vh;
@@ -147,7 +148,8 @@ body {
 }
 
 h1, h2, h3, h4, .brand-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: bold;
 }
 
 /* App Header Banner */
@@ -1249,3 +1251,80 @@ h1, h2, h3, h4, .brand-title {
   cursor: grabbing !important;
   color: var(--eu-gold);
 }
+
+/* Custom Driver.js Guided Tour Theme Customization */
+.driver-popover {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-glass) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  max-width: 340px !important;
+  font-family: inherit !important;
+}
+
+.driver-popover-title {
+  font-size: 1.02rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 6px !important;
+}
+
+.driver-popover-description {
+  font-size: 0.84rem !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.45 !important;
+}
+
+.driver-popover-footer {
+  margin-top: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.driver-popover-progress-text {
+  font-size: 0.76rem !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+}
+
+.driver-popover-prev-btn,
+.driver-popover-next-btn {
+  border-radius: 6px !important;
+  font-size: 0.8rem !important;
+  font-family: Arial, sans-serif !important;
+  font-weight: bold !important;
+  padding: 6px 14px !important;
+  transition: all 0.15s ease !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.driver-popover-next-btn {
+  background: #003399 !important;
+  color: #ffffff !important;
+  border: 1px solid #FFCC00 !important;
+  box-shadow: 0 2px 8px rgba(0, 51, 153, 0.3) !important;
+}
+
+.driver-popover-next-btn:hover {
+  background: #002266 !important;
+  color: #ffffff !important;
+  border-color: #FFCC00 !important;
+  box-shadow: 0 4px 12px rgba(0, 51, 153, 0.5) !important;
+}
+
+.driver-popover-prev-btn {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.driver-popover-prev-btn:hover {
+  background: var(--bg-primary) !important;
+  color: #003399 !important;
+  border-color: #003399 !important;
+}
+
