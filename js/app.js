@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         instList.forEach(inst => {
           instHTML += `
             <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-primary); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);">
-              ${inst.logoData ? `<img src="${inst.logoData}" style="width: 22px; height: 22px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px;">` : '🏫'}
+              ${inst.logoData ? `<img src="${inst.logoData}" class="modal-logo-thumb">` : '🏫'}
               <div style="flex: 1;">
                 <div style="font-size: 0.82rem; font-weight: 700;">${inst.acronym}</div>
                 <div style="font-size: 0.72rem; color: var(--text-muted);">${inst.name}</div>
@@ -203,39 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   /**
-   * Compress and resize uploaded logo files using an offscreen Canvas
-   * to keep JSON configuration sizes small (~20-40KB) and prevent config bloat.
+   * Read uploaded logo file directly as Data URL without canvas rescaling
    */
-  function processLogoFile(file, maxWidth = 300, maxHeight = 300) {
+  function processLogoFile(file) {
     return new Promise((resolve) => {
       if (!file) return resolve(null);
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          let width = img.width;
-          let height = img.height;
-
-          if (width > maxWidth || height > maxHeight) {
-            if (width > height) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            } else {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/png'));
-        };
-        img.onerror = () => resolve(e.target.result); // Fallback to raw data URL
-        img.src = e.target.result;
-      };
+      reader.onload = (e) => resolve(e.target.result);
       reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);
     });
@@ -325,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentEditingLogoData) {
       previewContainer.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px;">
-          <img src="${currentEditingLogoData}" style="width: 28px; height: 28px; object-fit: contain; border-radius: 4px; background: #fff; padding: 2px;">
+          <img src="${currentEditingLogoData}" class="modal-logo-thumb">
           <span style="font-size: 0.75rem; color: var(--text-primary);">Logo attached</span>
         </div>
         <button type="button" id="btn-remove-edit-logo" style="padding: 2px 6px; font-size: 0.72rem; color: var(--accent-rose); background: transparent; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">Remove Logo</button>

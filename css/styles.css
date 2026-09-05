@@ -603,9 +603,11 @@ h1, h2, h3, h4, .brand-title {
 }
 
 .logo-preview-thumb {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  max-height: 32px;
+  max-width: 60px;
+  width: auto;
+  height: auto;
+  border-radius: 4px;
   background: #ffffff;
   object-fit: contain;
   padding: 2px;
@@ -885,12 +887,54 @@ h1, h2, h3, h4, .brand-title {
 }
 
 .stack-logo-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  max-height: 22px;
+  max-width: 50px;
+  width: auto;
+  height: auto;
   object-fit: contain;
+  vertical-align: middle;
+}
+
+.legend-logo-thumb {
+  max-height: 20px;
+  max-width: 45px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
   background: #ffffff;
+  border-radius: 3px;
   padding: 1px;
+}
+
+.inset-logo-thumb {
+  max-height: 18px;
+  max-width: 40px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.tooltip-logo-thumb {
+  max-height: 16px;
+  max-width: 36px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.modal-logo-thumb {
+  max-height: 28px;
+  max-width: 60px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  vertical-align: middle;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2px;
 }
 
 .stack-partner-acronym {
@@ -940,6 +984,78 @@ h1, h2, h3, h4, .brand-title {
   align-items: center;
   gap: 10px;
   font-size: 0.78rem;
+}
+
+.legend-col-icon {
+  width: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-col-text {
+  flex: 1;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.legend-col-count {
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.legend-inst-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend-inst-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+}
+
+.legend-col-logo {
+  width: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-col-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.legend-inst-acronym {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.legend-inst-country {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.legend-inst-fullname {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+  line-height: 1.25;
 }
 
 .legend-color-swatch {

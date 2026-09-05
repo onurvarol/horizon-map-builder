@@ -230,7 +230,7 @@ class MapEngine {
         instList.forEach(inst => {
           instBadgeHTML += `
             <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.9); padding:3px 6px; border-radius:4px; color:#0f172a; font-size:0.72rem; font-weight:700;">
-              ${inst.logoData ? `<img src="${inst.logoData}" style="width:14px; height:14px; object-fit:contain;">` : '🏫'}
+              ${inst.logoData ? `<img src="${inst.logoData}" class="inset-logo-thumb">` : '🏫'}
               <span>${inst.acronym || inst.name}</span>
             </div>
           `;
@@ -398,7 +398,7 @@ class MapEngine {
     let html = `<div class="legend-title"><span class="drag-handle-icon" title="Drag to reposition">⋮⋮</span> Project Legend (${totalSelected} Countries)</div>`;
     
     if (rolesInUse.size === 0) {
-      html += `<div style="font-size: 0.75rem; color: var(--text-muted);">No countries selected yet. Select countries from the sidebar.</div>`;
+      html += `<div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">No countries selected yet. Select countries from the sidebar.</div>`;
     } else {
       rolesInUse.forEach(roleId => {
         const role = this.activeRoles[roleId] || HORIZON_ROLES[roleId];
@@ -406,9 +406,11 @@ class MapEngine {
         const count = Object.values(this.countryState).filter(s => s.selected && s.roleId === roleId).length;
         html += `
           <div class="legend-item">
-            <div class="legend-color-swatch" style="background-color: ${role.color};"></div>
-            <span style="flex: 1;">${role.label}</span>
-            <span style="font-weight: 700; color: var(--text-muted);">${count}</span>
+            <div class="legend-col-icon">
+              <div class="legend-color-swatch" style="background-color: ${role.color};"></div>
+            </div>
+            <div class="legend-col-text">${role.label}</div>
+            <div class="legend-col-count">${count}</div>
           </div>
         `;
       });
@@ -416,14 +418,23 @@ class MapEngine {
       // Render Partner Institutions in Legend
       if (this.logoManager && this.logoManager.institutions.length > 0) {
         html += `<div class="legend-title" style="margin-top: 8px;">Partner Institutions</div>`;
+        html += `<div class="legend-inst-list">`;
         this.logoManager.institutions.forEach(inst => {
+          const logoHTML = inst.logoData 
+            ? `<img src="${inst.logoData}" class="legend-logo-thumb">` 
+            : `<span style="font-size: 16px;">🏫</span>`;
+            
           html += `
-            <div class="legend-item">
-              ${inst.logoData ? `<img src="${inst.logoData}" style="width:14px; height:14px; object-fit:contain; border-radius:50%; background:#fff;">` : '🏫'}
-              <span style="flex:1; font-weight:600;">${inst.acronym} (${inst.countryId})</span>
+            <div class="legend-inst-row">
+              <div class="legend-col-logo">${logoHTML}</div>
+              <div class="legend-col-details">
+                <div class="legend-inst-acronym">${inst.acronym} <span class="legend-inst-country">(${inst.countryId})</span></div>
+                <div class="legend-inst-fullname" title="${inst.name}">${inst.name}</div>
+              </div>
             </div>
           `;
         });
+        html += `</div>`;
       }
     }
     
@@ -456,7 +467,7 @@ class MapEngine {
       instList.forEach(inst => {
         instHTML += `
           <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#f8fafc;">
-            ${inst.logoData ? `<img src="${inst.logoData}" style="width:12px; height:12px; object-fit:contain;">` : '🏫'}
+            ${inst.logoData ? `<img src="${inst.logoData}" class="tooltip-logo-thumb">` : '🏫'}
             <span>${inst.name} (${inst.acronym})</span>
           </div>
         `;
