@@ -8,8 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoManager = new LogoManager();
   const exportEngine = new ExportEngine('map-stage-viewport');
 
-  // Attach logo manager to map engine
+  // Attach logo manager & map engine
   mapEngine.logoManager = logoManager;
+  exportEngine.mapEngine = mapEngine;
+  exportEngine.logoManager = logoManager;
+
+  window.mapEngine = mapEngine;
+  window.logoManager = logoManager;
+  window.exportEngine = exportEngine;
 
   // UI Element References
   const searchInput = document.getElementById('country-search-input');
@@ -339,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fileInput.files && fileInput.files[0]) {
         logoData = await processLogoFile(fileInput.files[0]);
       } else if (urlInput) {
-        logoData = urlInput;
+        logoData = await ExportEngine.imageUrlToBase64(urlInput);
       }
 
       logoManager.updateInstitution(instId, {
@@ -382,9 +388,11 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCountryList();
       updateHeaderStats();
       
-      let logoData = urlInput.value.trim() || null;
+      let logoData = null;
       if (fileInput.files && fileInput.files[0]) {
         logoData = await processLogoFile(fileInput.files[0]);
+      } else if (urlInput.value.trim()) {
+        logoData = await ExportEngine.imageUrlToBase64(urlInput.value.trim());
       }
       
       logoManager.addInstitution(name, acronym, countryId, logoData);
@@ -510,17 +518,31 @@ document.addEventListener('DOMContentLoaded', () => {
     exportEngine.exportJSON(state, `${acronym}_map_config.json`);
   }
 
-  document.getElementById('btn-export-png')?.addEventListener('click', () => {
+  async function handleExportPNG() {
+    const btn1 = document.getElementById('btn-export-png');
+    const btn2 = document.getElementById('btn-export-png-tab');
     const scale = parseInt(document.getElementById('export-scale-select')?.value || '2');
     const acronym = document.getElementById('project-acronym-input')?.value || 'horizon';
-    exportEngine.exportPNG(scale, `${acronym}_consortium_map.png`);
-  });
 
-  document.getElementById('btn-export-png-tab')?.addEventListener('click', () => {
-    const scale = parseInt(document.getElementById('export-scale-select')?.value || '2');
-    const acronym = document.getElementById('project-acronym-input')?.value || 'horizon';
-    exportEngine.exportPNG(scale, `${acronym}_consortium_map.png`);
-  });
+    const originalText1 = btn1 ? btn1.innerText : '📸 Export Map';
+    const originalText2 = btn2 ? btn2.innerText : '📸 Download High-Res PNG';
+
+    try {
+      if (btn1) { btn1.innerText = '⏳ Exporting...'; btn1.disabled = true; }
+      if (btn2) { btn2.innerText = '⏳ Exporting...'; btn2.disabled = true; }
+
+      await exportEngine.exportPNG(scale, `${acronym}_consortium_map.png`);
+    } catch (err) {
+      console.error('Export error:', err);
+      alert('Export encountered an error: ' + (err.message || err));
+    } finally {
+      if (btn1) { btn1.innerText = originalText1; btn1.disabled = false; }
+      if (btn2) { btn2.innerText = originalText2; btn2.disabled = false; }
+    }
+  }
+
+  document.getElementById('btn-export-png')?.addEventListener('click', handleExportPNG);
+  document.getElementById('btn-export-png-tab')?.addEventListener('click', handleExportPNG);
 
   document.getElementById('btn-save-json')?.addEventListener('click', saveProjectConfig);
   document.getElementById('btn-save-json-tab')?.addEventListener('click', saveProjectConfig);
@@ -537,76 +559,94 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-load-json')?.addEventListener('click', triggerLoadConfig);
   document.getElementById('btn-load-json-tab')?.addEventListener('click', triggerLoadConfig);
 
-  configFileFileInput?.addEventListener('change', (e) => {
+  async function loadProjectConfig(data) {
+    if (!data) return;
+
+    // 1. Restore Project Metadata
+    if (data.acronym !== undefined) {
+      const acrInput = document.getElementById('project-acronym-input');
+      if (acrInput) acrInput.value = data.acronym;
+    }
+    if (data.title !== undefined) {
+      const titleInput = document.getElementById('project-title-input');
+      if (titleInput) titleInput.value = data.title;
+    }
+
+    // 2. Restore Roles & Colors
+    if (data.roles) {
+      Object.keys(data.roles).forEach(rId => {
+        if (HORIZON_ROLES[rId]) {
+          HORIZON_ROLES[rId].color = data.roles[rId].color;
+          if (data.roles[rId].label) HORIZON_ROLES[rId].label = data.roles[rId].label;
+        }
+        if (mapEngine.activeRoles[rId]) {
+          mapEngine.activeRoles[rId].color = data.roles[rId].color;
+          if (data.roles[rId].label) mapEngine.activeRoles[rId].label = data.roles[rId].label;
+        }
+        // Update color pickers & hex inputs
+        const hexInput = document.getElementById(`hex-input-${rId}`);
+        if (hexInput) hexInput.value = data.roles[rId].color.toUpperCase();
+        const colorPicker = document.querySelector(`.color-picker-input[data-role="${rId}"]`);
+        if (colorPicker) colorPicker.value = data.roles[rId].color;
+      });
+    }
+
+    // 3. Restore Country Selections & Custom Offsets
+    if (data.countryState) {
+      mapEngine.countryState = {};
+      HORIZON_COUNTRIES.forEach(c => {
+        const p = document.getElementById(`country-path-${c.id}`);
+        if (p) {
+          p.style.fill = 'var(--country-default)';
+          p.classList.remove('participating');
+        }
+      });
+      
+      Object.keys(data.countryState).forEach(cId => {
+        const st = data.countryState[cId];
+        mapEngine.updateCountryState(cId, st.selected, st.roleId, st.customColor);
+        if (st.customOffset && mapEngine.countryState[cId]) {
+          mapEngine.countryState[cId].customOffset = st.customOffset;
+        }
+      });
+    }
+
+    // 4. Restore Partner Institutions & Convert Logos to Base64
+    if (Array.isArray(data.institutions)) {
+      logoManager.institutions = data.institutions;
+      await Promise.all(logoManager.institutions.map(async (inst) => {
+        if (inst.logoData && !inst.logoData.startsWith('data:')) {
+          try {
+            const b64 = await ExportEngine.imageUrlToBase64(inst.logoData, 4000, inst.acronym);
+            if (b64 && b64.startsWith('data:')) {
+              inst.logoData = b64;
+            }
+          } catch (e) {}
+        }
+      }));
+    }
+
+    // 5. Re-render UI and Canvas components
+    renderCountryList();
+    renderInstitutionList();
+    mapEngine.renderLogoPins();
+    mapEngine.renderInsetBoxes();
+    mapEngine.updateLegend();
+    updateHeaderStats();
+  }
+
+  window.app = { loadProjectConfig };
+
+  configFileFileInput?.addEventListener('change', async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const data = JSON.parse(event.target.result);
-        
-        // 1. Restore Project Metadata
-        if (data.acronym !== undefined) {
-          const acrInput = document.getElementById('project-acronym-input');
-          if (acrInput) acrInput.value = data.acronym;
-        }
-        if (data.title !== undefined) {
-          const titleInput = document.getElementById('project-title-input');
-          if (titleInput) titleInput.value = data.title;
-        }
-
-        // 2. Restore Roles & Colors
-        if (data.roles) {
-          Object.keys(data.roles).forEach(rId => {
-            if (HORIZON_ROLES[rId]) {
-              HORIZON_ROLES[rId].color = data.roles[rId].color;
-              if (data.roles[rId].label) HORIZON_ROLES[rId].label = data.roles[rId].label;
-            }
-            if (mapEngine.activeRoles[rId]) {
-              mapEngine.activeRoles[rId].color = data.roles[rId].color;
-              if (data.roles[rId].label) mapEngine.activeRoles[rId].label = data.roles[rId].label;
-            }
-            // Update color pickers & hex inputs
-            const hexInput = document.getElementById(`hex-input-${rId}`);
-            if (hexInput) hexInput.value = data.roles[rId].color.toUpperCase();
-            const colorPicker = document.querySelector(`.color-picker-input[data-role="${rId}"]`);
-            if (colorPicker) colorPicker.value = data.roles[rId].color;
-          });
-        }
-
-        // 3. Restore Partner Institutions & Logos
-        if (Array.isArray(data.institutions)) {
-          logoManager.institutions = data.institutions;
-        }
-
-        // 4. Restore Country Selections
-        if (data.countryState) {
-          mapEngine.countryState = {};
-          HORIZON_COUNTRIES.forEach(c => {
-            const p = document.getElementById(`country-path-${c.id}`);
-            if (p) {
-              p.style.fill = 'var(--country-default)';
-              p.classList.remove('participating');
-            }
-          });
-          
-          Object.keys(data.countryState).forEach(cId => {
-            const st = data.countryState[cId];
-            mapEngine.updateCountryState(cId, st.selected, st.roleId, st.customColor);
-          });
-        }
-
-        // Re-render UI
-        renderCountryList();
-        renderInstitutionList();
-        mapEngine.renderLogoPins();
-        mapEngine.renderInsetBoxes();
-        mapEngine.updateLegend();
-        updateHeaderStats();
-
+        await loadProjectConfig(data);
         configFileFileInput.value = '';
-
       } catch (err) {
         alert('Failed to parse configuration JSON file: ' + err.message);
       }
@@ -637,6 +677,21 @@ document.addEventListener('DOMContentLoaded', () => {
   populateCountryDropdowns();
   // Activate default institution in Sabancı University, TR
   mapEngine.updateCountryState('TR', true, 'COORDINATOR');
+
+  // Pre-convert default institution logo (assets/sabanci-icon.jpg) to Base64 Data URL
+  const defaultInst = logoManager.getInstitution('inst-default-su');
+  if (defaultInst && defaultInst.logoData && !defaultInst.logoData.startsWith('data:')) {
+    ExportEngine.imageUrlToBase64(defaultInst.logoData).then(b64 => {
+      if (b64) {
+        defaultInst.logoData = b64;
+        renderInstitutionList();
+        mapEngine.renderLogoPins();
+        mapEngine.renderInsetBoxes();
+        mapEngine.updateLegend();
+      }
+    });
+  }
+
   renderCountryList();
   renderInstitutionList();
   updateHeaderStats();

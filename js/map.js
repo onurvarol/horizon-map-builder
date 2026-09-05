@@ -161,7 +161,7 @@ class MapEngine {
       let rowsHTML = '';
       instList.forEach(inst => {
         const logoHTML = inst.logoData 
-          ? `<img src="${inst.logoData}" class="stack-logo-thumb">` 
+          ? `<img src="${inst.logoData}" class="stack-logo-thumb" onerror="this.onerror=null; this.style.display='none';">` 
           : `<span style="font-size:12px;">🏫</span>`;
           
         rowsHTML += `
@@ -230,7 +230,7 @@ class MapEngine {
         instList.forEach(inst => {
           instBadgeHTML += `
             <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.9); padding:3px 6px; border-radius:4px; color:#0f172a; font-size:0.72rem; font-weight:700;">
-              ${inst.logoData ? `<img src="${inst.logoData}" class="inset-logo-thumb">` : '🏫'}
+              ${inst.logoData ? `<img src="${inst.logoData}" class="inset-logo-thumb" onerror="this.onerror=null; this.style.display='none';">` : '🏫'}
               <span>${inst.acronym || inst.name}</span>
             </div>
           `;
@@ -421,7 +421,7 @@ class MapEngine {
         html += `<div class="legend-inst-list">`;
         this.logoManager.institutions.forEach(inst => {
           const logoHTML = inst.logoData 
-            ? `<img src="${inst.logoData}" class="legend-logo-thumb">` 
+            ? `<img src="${inst.logoData}" class="legend-logo-thumb" onerror="this.onerror=null; this.style.display='none';">` 
             : `<span style="font-size: 16px;">🏫</span>`;
             
           html += `
@@ -467,7 +467,7 @@ class MapEngine {
       instList.forEach(inst => {
         instHTML += `
           <div style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#f8fafc;">
-            ${inst.logoData ? `<img src="${inst.logoData}" class="tooltip-logo-thumb">` : '🏫'}
+            ${inst.logoData ? `<img src="${inst.logoData}" class="tooltip-logo-thumb" onerror="this.onerror=null; this.style.display='none';">` : '🏫'}
             <span>${inst.name} (${inst.acronym})</span>
           </div>
         `;

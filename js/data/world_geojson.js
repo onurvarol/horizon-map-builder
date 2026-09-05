@@ -1213,5 +1213,7 @@ const DISTANT_INSET_SVG = {
   }
 };
 
-module.exports = { EUROPE_MAP_BOUNDS, EUROPE_COUNTRY_SVG, EUROPE_COUNTRY_CENTROIDS, DISTANT_INSET_SVG };
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { EUROPE_MAP_BOUNDS, EUROPE_COUNTRY_SVG, EUROPE_COUNTRY_CENTROIDS, DISTANT_INSET_SVG };
+}
 

@@ -609,9 +609,11 @@ h1, h2, h3, h4, .brand-title {
   height: auto;
   border-radius: 4px;
   background: #ffffff;
-  object-fit: contain;
   padding: 2px;
   border: 1px solid var(--border-color);
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .institution-details {
@@ -891,8 +893,9 @@ h1, h2, h3, h4, .brand-title {
   max-width: 50px;
   width: auto;
   height: auto;
-  object-fit: contain;
   vertical-align: middle;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .legend-logo-thumb {
@@ -900,11 +903,12 @@ h1, h2, h3, h4, .brand-title {
   max-width: 45px;
   width: auto;
   height: auto;
-  object-fit: contain;
   vertical-align: middle;
   background: #ffffff;
   border-radius: 3px;
   padding: 1px;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .inset-logo-thumb {
@@ -912,8 +916,9 @@ h1, h2, h3, h4, .brand-title {
   max-width: 40px;
   width: auto;
   height: auto;
-  object-fit: contain;
   vertical-align: middle;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .tooltip-logo-thumb {
@@ -921,8 +926,9 @@ h1, h2, h3, h4, .brand-title {
   max-width: 36px;
   width: auto;
   height: auto;
-  object-fit: contain;
   vertical-align: middle;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .modal-logo-thumb {
@@ -930,11 +936,12 @@ h1, h2, h3, h4, .brand-title {
   max-width: 60px;
   width: auto;
   height: auto;
-  object-fit: contain;
   vertical-align: middle;
   background: #ffffff;
   border-radius: 4px;
   padding: 2px;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .stack-partner-acronym {
